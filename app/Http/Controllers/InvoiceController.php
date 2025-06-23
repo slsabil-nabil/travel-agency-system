@@ -16,13 +16,10 @@ class InvoiceController extends Controller
         $this->middleware('permission:invoices.delete')->only(['destroy']);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $user = Auth::user();
-        $query = Invoice::with('agency');
+        $query = Invoice::query();
 
         if (!$user->hasRole('system_admin')) {
             $query->where('agency_id', $user->agency_id);
@@ -33,51 +30,92 @@ class InvoiceController extends Controller
         return view('invoices.index', compact('invoices'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('invoices.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'client_name' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'due_date' => 'required|date',
+        ]);
+
+        $user = Auth::user();
+
+        $invoice = new Invoice([
+            'client_name' => $request->client_name,
+            'amount' => $request->amount,
+            'due_date' => $request->due_date,
+            'agency_id' => $user->hasRole('system_admin') ? ($request->agency_id ?? null) : $user->agency_id,
+        ]);
+
+        $invoice->save();
+
+        return redirect()->route('invoices.index')->with('success', 'تم إنشاء الفاتورة بنجاح.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        $invoice = Invoice::findOrFail($id);
+        $user = Auth::user();
+
+        if (!$user->hasRole('system_admin') && $user->agency_id !== $invoice->agency_id) {
+            abort(403, 'لا تملك الصلاحية');
+        }
+
+        return view('invoices.show', compact('invoice'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+        $invoice = Invoice::findOrFail($id);
+        $user = Auth::user();
+
+        if (!$user->hasRole('system_admin') && $user->agency_id !== $invoice->agency_id) {
+            abort(403, 'لا تملك الصلاحية');
+        }
+
+        return view('invoices.edit', compact('invoice'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'client_name' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'due_date' => 'required|date',
+        ]);
+
+        $invoice = Invoice::findOrFail($id);
+        $user = Auth::user();
+
+        if (!$user->hasRole('system_admin') && $user->agency_id !== $invoice->agency_id) {
+            abort(403, 'لا تملك الصلاحية');
+        }
+
+        $invoice->update([
+            'client_name' => $request->client_name,
+            'amount' => $request->amount,
+            'due_date' => $request->due_date,
+        ]);
+
+        return redirect()->route('invoices.index')->with('success', 'تم تعديل الفاتورة بنجاح.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $invoice = Invoice::findOrFail($id);
+        $user = Auth::user();
+
+        if (!$user->hasRole('system_admin') && $user->agency_id !== $invoice->agency_id) {
+            abort(403, 'لا تملك الصلاحية');
+        }
+
+        $invoice->delete();
+
+        return redirect()->route('invoices.index')->with('success', 'تم حذف الفاتورة بنجاح.');
     }
 }

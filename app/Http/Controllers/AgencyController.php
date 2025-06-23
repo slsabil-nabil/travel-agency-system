@@ -16,48 +16,26 @@ class AgencyController extends Controller
         $this->middleware('permission:agencies.delete')->only(['destroy']);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $query = Agency::with('agency');
+        $query = Agency::query();
         $currentUser = Auth::user();
 
         if (!$currentUser->hasRole('system_admin')) {
-            $query->where('agency_id', $currentUser->agency_id);
+            $query->where('id', $currentUser->agency_id);
         }
 
-        $bookings = $query->latest()->paginate(10); // حسب ما يناسبك
-        $agencies = \App\Models\Agency::latest()->paginate(10);
+        $agencies = $query->latest()->paginate(10);
         return view('agencies.index', compact('agencies'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        $query = Agency::with('agency');
-        $currentUser = Auth::user();
-
-        if (!$currentUser->hasRole('system_admin')) {
-            $query->where('agency_id', $currentUser->agency_id);
-        }
         return view('agencies.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $query = Agency::with('agency');
-        $currentUser = Auth::user();
-
-        if (!$currentUser->hasRole('system_admin')) {
-            $query->where('agency_id', $currentUser->agency_id);
-        }
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'nullable|email',
@@ -65,51 +43,42 @@ class AgencyController extends Controller
             'address' => 'nullable|string|max:255',
         ]);
 
-        \App\Models\Agency::create($request->only(['name', 'email', 'phone', 'address']));
+        Agency::create($request->only(['name', 'email', 'phone', 'address']));
 
         return redirect()->route('agencies.index')->with('success', 'تم إضافة الوكالة بنجاح');
     }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        $query = Agency::with('agency');
+        $agency = Agency::findOrFail($id);
         $currentUser = Auth::user();
 
-        if (!$currentUser->hasRole('system_admin')) {
-            $query->where('agency_id', $currentUser->agency_id);
+        if (!$currentUser->hasRole('system_admin') && $currentUser->agency_id !== $agency->id) {
+            abort(403, 'لا تملك الصلاحية');
         }
+
+        return view('agencies.show', compact('agency'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(\App\Models\Agency $agency)
+    public function edit(Agency $agency)
     {
-        $query = Agency::with('agency');
         $currentUser = Auth::user();
 
-        if (!$currentUser->hasRole('system_admin')) {
-            $query->where('agency_id', $currentUser->agency_id);
+        if (!$currentUser->hasRole('system_admin') && $currentUser->agency_id !== $agency->id) {
+            abort(403, 'لا تملك الصلاحية');
         }
+
         return view('agencies.edit', compact('agency'));
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, \App\Models\Agency $agency)
+    public function update(Request $request, Agency $agency)
     {
-        $query = Agency::with('agency');
         $currentUser = Auth::user();
 
-        if (!$currentUser->hasRole('system_admin')) {
-            $query->where('agency_id', $currentUser->agency_id);
+        if (!$currentUser->hasRole('system_admin') && $currentUser->agency_id !== $agency->id) {
+            abort(403, 'لا تملك الصلاحية');
         }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'nullable|email',
@@ -122,18 +91,14 @@ class AgencyController extends Controller
         return redirect()->route('agencies.index')->with('success', 'تم تعديل بيانات الوكالة بنجاح');
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(\App\Models\Agency $agency)
+    public function destroy(Agency $agency)
     {
-        $query = Agency::with('agency');
         $currentUser = Auth::user();
 
-        if (!$currentUser->hasRole('system_admin')) {
-            $query->where('agency_id', $currentUser->agency_id);
+        if (!$currentUser->hasRole('system_admin') && $currentUser->agency_id !== $agency->id) {
+            abort(403, 'لا تملك الصلاحية');
         }
+
         $agency->delete();
 
         return redirect()->route('agencies.index')->with('success', 'تم حذف الوكالة بنجاح');

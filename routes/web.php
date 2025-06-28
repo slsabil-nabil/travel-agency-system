@@ -11,10 +11,13 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AgencyController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
 });
+
 
 // ✅ تعديل صلاحية دخول لوحة التحكم
 Route::get('/dashboard', function () {
@@ -63,5 +66,18 @@ Route::resource('bookings', BookingController::class)->middleware(['auth']);
 
 // ✅ إدارة الفواتير
 Route::resource('invoices', InvoiceController::class)->middleware(['auth']);
+
+Route::middleware('guest')->group(function () {
+    // صفحة تسجيل حساب جديد
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store']);
+
+    // نسيت كلمة المرور
+    Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+});
+
+Route::put('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.update.avatar');
+
 
 require __DIR__ . '/auth.php';

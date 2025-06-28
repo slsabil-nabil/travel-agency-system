@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        @livewireStyles
         <!-- Toastr CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
@@ -17,6 +18,7 @@
         <!-- Scripts & Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
+    @livewireScripts
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 flex">
             @include('layouts.navigation')
@@ -31,7 +33,8 @@
                 @endisset
 
                 <main>
-                    @yield('content')
+                   {{ $slot ?? '' }}
+    @yield('content')
                 </main>
             </div>
         </div>

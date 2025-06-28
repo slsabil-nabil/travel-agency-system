@@ -40,11 +40,18 @@
                 </div>
 
                 <!-- روابط إضافية -->
-                <div class="text-sm text-center text-gray-500 flex flex-wrap justify-center gap-2 mt-4">
-                    <a href="#" class="text-blue-600 hover:underline">نسيت كلمة المرور؟</a>
-                    <span>|</span>
-                    <a href="#" class="text-blue-600 hover:underline">إنشاء حساب جديد</a>
-                </div>
+                <div class="flex justify-center items-center gap-4 mt-6 text-sm text-blue-600 font-medium">
+    <a href="{{ route('password.request') }}" class="hover:underline">
+        نسيت كلمة المرور؟
+    </a>
+
+    <span class="text-gray-300">|</span>
+
+    <a href="{{ route('register') }}" class="hover:underline">
+        إنشاء حساب جديد
+    </a>
+</div>
+
             </form>
 
         </div>

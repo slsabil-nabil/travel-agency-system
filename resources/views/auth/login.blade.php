@@ -1,47 +1,52 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <div dir="rtl" class="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-10" style="font-family: 'Tajawal', sans-serif;">
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-md border border-gray-200 p-10 px-8 lg:px-16 flex flex-col items-center space-y-6">
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <!-- الشعار -->
+            <div class="flex justify-center">
+                <img src="{{ asset('images/Traveling.jpg') }}" alt="شعار النظام" class="h-28 w-auto mb-4">
+            </div>
+
+            <!-- العنوان -->
+            <h2 class="text-2xl font-extrabold text-blue-800 mb-4">مرحباً بعودتك</h2>
+
+            <!-- النموذج -->
+            <form method="POST" action="{{ route('login') }}" class="w-full space-y-5">
+                @csrf
+
+                <!-- البريد الإلكتروني -->
+                <div class="text-right">
+                    <label for="email" class="block mb-1 text-base text-gray-700">البريد الإلكتروني</label>
+                    <input type="email" name="email" id="email"
+                        class="w-full p-3 text-base rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition"
+                        required autofocus />
+                </div>
+
+                <!-- كلمة المرور -->
+                <div class="text-right">
+                    <label for="password" class="block mb-1 text-base text-gray-700">كلمة المرور</label>
+                    <input type="password" name="password" id="password"
+                        class="w-full p-3 text-base rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition"
+                        required />
+                </div>
+
+                <!-- زر الدخول -->
+                <div>
+                    <button type="submit"
+                        class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-base transition font-semibold">
+                        تسجيل الدخول
+                    </button>
+                </div>
+
+                <!-- روابط إضافية -->
+                <div class="text-sm text-center text-gray-500 flex flex-wrap justify-center gap-2 mt-4">
+                    <a href="#" class="text-blue-600 hover:underline">نسيت كلمة المرور؟</a>
+                    <span>|</span>
+                    <a href="#" class="text-blue-600 hover:underline">إنشاء حساب جديد</a>
+                </div>
+            </form>
+
         </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
+    </div>
 </x-guest-layout>
